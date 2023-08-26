@@ -10,8 +10,8 @@
     </parent>
     <artifactId>stat</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>stat-svc</name>
-    <description>stat-svc</description>
+    <name>stat</name>
+    <description>stat</description>
     <properties>
         <java.version>11</java.version>
         <maven.compiler.source>11</maven.compiler.source>

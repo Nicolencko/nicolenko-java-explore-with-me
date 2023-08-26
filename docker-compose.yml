@@ -7,24 +7,27 @@ services:
     ports:
     - "9090:9090"
     depends_on:
-      - stats-db
+      - ewm-stats-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/ewm-stats
+      - STAT_DATASOURCE_URL=jdbc:postgresql://ewm-stats-db:5432/ewm-stats-db
       - SERVER_PORT=9090
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=password
+      - STATS_DB_HOST=ewm-stats-db
+      - STATS_DB_PORT=5432
+      - STATS_DB_NAME=ewm-stats-db
+      - STAT_DATASOURCE_USERNAME=postgres
+      - STAT_DATASOURCE_PASSWORD=password
 
-  stats-db:
+  ewm-stats-db:
     image: postgres:9.5-alpine
     container_name: ewm-stats-db
     ports:
       - "6541:5432"
     environment:
-      - POSTGRES_DB=ewm-stats
+      - POSTGRES_DB=ewm-stats-db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
 
-  ewm-service:
+  main:
     build: main
     image: main
     container_name: main
@@ -32,11 +35,16 @@ services:
       - "8080:8080"
     depends_on:
       - ewm-db
+      - stat-server
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/explore
+      - MAIN_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/explore
+      - STAT_SERVER_URL=http://stat-server:9090
       - SERVER_PORT=8080
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=password
+      - DB_HOST=ewm-db
+      - DB_PORT=5432
+      - DB_NAME=explore
+      - MAIN_DATASOURCE_USERNAME=postgres
+      - MAIN_DATASOURCE_PASSWORD=password
 
   ewm-db:
     image: postgres:9.5-alpine
