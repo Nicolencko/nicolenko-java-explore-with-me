@@ -9,21 +9,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import ru.practicum.dto.HitDtoInput;
 import ru.practicum.StatClient;
-import ru.practicum.mainsvc.category.repository.CategoryRepository;
+import ru.practicum.dto.HitDtoInput;
 import ru.practicum.mainsvc.category.model.Category;
-import ru.practicum.mainsvc.event.dto.EventMapper;
-import ru.practicum.mainsvc.event.repository.EventRepository;
+import ru.practicum.mainsvc.category.repository.CategoryRepository;
 import ru.practicum.mainsvc.event.dto.*;
 import ru.practicum.mainsvc.event.model.Event;
+import ru.practicum.mainsvc.event.repository.EventRepository;
 import ru.practicum.mainsvc.exception.BadRequestException;
-import ru.practicum.mainsvc.request.dto.RequestMapper;
-import ru.practicum.mainsvc.request.service.RequestService;
 import ru.practicum.mainsvc.request.dto.ParticipationRequestDto;
+import ru.practicum.mainsvc.request.dto.RequestMapper;
 import ru.practicum.mainsvc.request.model.Request;
-import ru.practicum.mainsvc.user.repository.UserRepository;
+import ru.practicum.mainsvc.request.service.RequestService;
 import ru.practicum.mainsvc.user.model.User;
+import ru.practicum.mainsvc.user.repository.UserRepository;
 import ru.practicum.mainsvc.utils.QPredicates;
 
 import java.net.URI;
@@ -71,7 +70,7 @@ public class EventServiceImpl implements EventService {
         ));
         Predicate predicate = QPredicates.builder()
                 .add(text, (event.annotation.containsIgnoreCase(String.valueOf(text))).or(event.description.containsIgnoreCase(String.valueOf(text))))
-                .add(categories, event.category::in)
+                .add(categories, event.categoryId::in)
                 .add(paid, event.paid::eq)
                 .add(parseLocalDateTime(rangeStart, formatter), event.eventDate::goe)
                 .add(parseLocalDateTime(rangeEnd, formatter), event.eventDate::lt)
@@ -110,7 +109,7 @@ public class EventServiceImpl implements EventService {
         Predicate predicate = QPredicates.builder()
                 .add(users, event.initiator::in)
                 .add(states, event.state::in)
-                .add(categories, event.category::in)
+                .add(categories, event.categoryId::in)
                 .add(parseLocalDateTime(rangeStart, formatter), event.eventDate::goe)
                 .add(parseLocalDateTime(rangeEnd, formatter), event.eventDate::lt)
                 .buildAnd();
@@ -138,7 +137,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getEvent(Long id, String ip) {
         Event event = eventRepository.findById(id).get();
-        Category category = categoryRepository.getReferenceById(event.getCategory());
+        Category category = categoryRepository.getReferenceById(event.getCategoryId());
         User user = userRepository.getReferenceById(event.getInitiator());
         client.saveHit(new HitDtoInput(
                 "ewm-main-service",
@@ -178,7 +177,7 @@ public class EventServiceImpl implements EventService {
                 event.setAnnotation(updateEventRequest.getAnnotation());
             }
             if (updateEventRequest.getCategory() != null) {
-                event.setCategory(updateEventRequest.getCategory());
+                event.setCategoryId(updateEventRequest.getCategory());
             }
             if (updateEventRequest.getDescription() != null) {
                 event.setDescription(updateEventRequest.getDescription());
@@ -217,7 +216,7 @@ public class EventServiceImpl implements EventService {
             event.setAnnotation(updatedEvent.getAnnotation());
         }
         if (updatedEvent.getCategory() != null) {
-            event.setCategory(updatedEvent.getCategory());
+            event.setCategoryId(updatedEvent.getCategory());
         }
         if (updatedEvent.getDescription() != null) {
             event.setDescription(updatedEvent.getDescription());
@@ -366,7 +365,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto rejectEvent(Long eventId) {
         Event event = eventRepository.getReferenceById(eventId);
-        if (event.getState() == "PUBLISHED") {
+        if (Objects.equals(event.getState(), "PUBLISHED")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Событие уже опубликовано");
         }
         event.setState("CANCELED");

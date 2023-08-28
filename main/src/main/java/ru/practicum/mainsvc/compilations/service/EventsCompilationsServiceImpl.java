@@ -2,11 +2,13 @@ package ru.practicum.mainsvc.compilations.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.mainsvc.compilations.repository.EventsCompilationsRepository;
 import ru.practicum.mainsvc.compilations.model.EventsCompilations;
 import ru.practicum.mainsvc.compilations.model.EventsCompilationsId;
+import ru.practicum.mainsvc.compilations.repository.EventsCompilationsRepository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +18,15 @@ public class EventsCompilationsServiceImpl implements EventsCompilationsService 
     @Override
     public List<EventsCompilations> getCompilation(Long compilationId) {
         return eventsCompilationsRepository.getCompilationById(compilationId);
+    }
+
+    @Override
+    public Map<Long, List<EventsCompilations>> getCompilationMap(List<Long> compilationIds) {
+        return eventsCompilationsRepository.getCompilationsByIds(compilationIds).stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        EventsCompilations::getCompilationId,
+                                        Collectors.toList()));
     }
 
     @Override

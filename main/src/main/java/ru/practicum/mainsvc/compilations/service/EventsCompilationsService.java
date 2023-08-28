@@ -4,9 +4,12 @@ import ru.practicum.mainsvc.compilations.model.EventsCompilations;
 import ru.practicum.mainsvc.compilations.model.EventsCompilationsId;
 
 import java.util.List;
+import java.util.Map;
 
 public interface EventsCompilationsService {
     List<EventsCompilations> getCompilation(Long compilationId);
+
+    Map<Long, List<EventsCompilations>> getCompilationMap(List<Long> compilationIds);
 
     void saveEventCompilation(EventsCompilations eventsCompilations);
 

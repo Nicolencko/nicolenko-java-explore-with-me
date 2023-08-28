@@ -18,6 +18,7 @@ import ru.practicum.mainsvc.event.dto.EventShortDto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,22 +32,20 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
         Pageable pageable = PageRequest.of(from, size);
-        Page<Compilation> compilations;
-        if (pinned == null) {
-            compilations = compilationRepository.findAll(pageable);
-        } else {
-            compilations = compilationRepository.getCompilations(pinned, pageable);
-        }
+        Page<Compilation> compilations = compilationRepository.getCompilations(pinned, pageable);
 
         List<CompilationDto> compilationDtoList = new ArrayList<>();
+        List<Long> compilationIds = compilations.stream()
+                .map(Compilation::getId)
+                .collect(Collectors.toList());
+        Map<Long, List<EventsCompilations>> eventsCompilationsMap = eventsCompilationsService
+                .getCompilationMap(compilationIds);
         for (Compilation compilation : compilations) {
-            List<EventsCompilations> eventsCompilations =
-                    eventsCompilationsService.getCompilation(compilation.getId());
-            List<Long> eventIds = eventsCompilations.stream()
+            List<Long> eventIds = eventsCompilationsMap.get(compilation.getId()).stream()
                     .map(EventsCompilations::getEventId)
                     .collect(Collectors.toList());
             List<EventShortDto> events = new ArrayList<>();
-            if (eventIds.size() != 0) {
+            if (!eventIds.isEmpty()) {
                 events = eventService.getEventsListByIdsList(eventIds);
             }
             CompilationDto compilationDto = compilationMapper.mapToCompilationDto(compilation, events);

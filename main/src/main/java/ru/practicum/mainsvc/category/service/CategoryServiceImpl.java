@@ -50,8 +50,8 @@ public class CategoryServiceImpl implements CategoryService {
         }
         Category category = categoryRepository.getReferenceById(catId);
         category.setName(categoryDto.getName());
-        categoryRepository.save(category);
-        return categoryMapper.mapCategoryToDto(category);
+        Category result = categoryRepository.save(category);
+        return categoryMapper.mapCategoryToDto(result);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(Long catId) {
-        if (eventRepository.findEventsByCategory(catId).size() > 0) {
+        if (eventRepository.existsAllByCategory(catId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Нельзя удалить категорию со связанными событиями");
         }
         categoryRepository.deleteById(catId);

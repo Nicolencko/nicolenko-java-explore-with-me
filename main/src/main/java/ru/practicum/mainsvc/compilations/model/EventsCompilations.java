@@ -1,8 +1,6 @@
 package ru.practicum.mainsvc.compilations.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -11,7 +9,8 @@ import javax.persistence.Table;
 
 @Entity
 @IdClass(EventsCompilationsId.class)
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "events_compilations")

@@ -11,4 +11,7 @@ public interface EventsCompilationsRepository extends JpaRepository<EventsCompil
 
     @Query(nativeQuery = true, value = "SELECT * FROM events_compilations WHERE compilation_id = :compilationId")
     List<EventsCompilations> getCompilationById(Long compilationId);
+
+    @Query(nativeQuery = true, value = "SELECT * FROM events_compilations WHERE compilation_id IN (:compilationIds)")
+    List<EventsCompilations> getCompilationsByIds(List<Long> compilationIds);
 }

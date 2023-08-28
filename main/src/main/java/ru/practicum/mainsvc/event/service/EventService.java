@@ -18,9 +18,9 @@ public interface EventService {
                                   Integer from,
                                   Integer size);
 
-    List<EventFullDto> getEvents(List<Long> users,
+    List<EventFullDto> getEvents(List<Long> userIds,
                                  List<String> states,
-                                 List<Long> categories,
+                                 List<Long> categoryIds,
                                  String rangeStart,
                                  String rangeEnd,
                                  Integer from,

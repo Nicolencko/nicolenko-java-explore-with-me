@@ -15,6 +15,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPre
     @Query(nativeQuery = true, value = "SELECT id FROM events")
     List<Integer> getAllIds();
 
-    @Query(nativeQuery = true, value = "SELECT * FROM events WHERE events.category = :categoryId")
-    List<Event> findEventsByCategory(Long categoryId);
+    @Query(nativeQuery = true, value = "SELECT * FROM events WHERE events.categoryId = :catId")
+    boolean existsAllByCategory(Long catId);
 }

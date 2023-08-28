@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE id IN (:ids)")
+    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE (:ids is null or id IN (:ids))")
     List<User> getUsersListByIdList(List<Long> ids, Pageable pageable);
 
     Boolean existsUserByName(String name);

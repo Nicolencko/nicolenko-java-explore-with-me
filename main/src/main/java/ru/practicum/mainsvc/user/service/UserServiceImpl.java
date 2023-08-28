@@ -6,12 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import ru.practicum.mainsvc.user.repository.UserRepository;
 import ru.practicum.mainsvc.user.dto.NewUserDto;
 import ru.practicum.mainsvc.user.dto.UserDto;
 import ru.practicum.mainsvc.user.dto.UserMapper;
 import ru.practicum.mainsvc.user.dto.UserShortDto;
 import ru.practicum.mainsvc.user.model.User;
+import ru.practicum.mainsvc.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,12 +31,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> getUsers(List<Long> ids, Integer from, Integer size) {
         Pageable pageable = PageRequest.of(from, size);
-        Iterable<User> users;
-        if (ids != null) {
-            users = userRepository.getUsersListByIdList(ids, pageable);
-        } else {
-            users = userRepository.findAll(pageable);
-        }
+        Iterable<User> users = userRepository.getUsersListByIdList(ids, pageable);
         return StreamSupport.stream(users.spliterator(), false)
                 .map(userMapper::mapToUserDto)
                 .collect(Collectors.toList());

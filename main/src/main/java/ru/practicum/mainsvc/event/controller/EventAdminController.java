@@ -18,16 +18,16 @@ public class EventAdminController {
 
     @GetMapping
     public List<EventFullDto> getEvents(
-            @RequestParam(required = false) List<Long> users,
+            @RequestParam(required = false) List<Long> userIds,
             @RequestParam(required = false) List<String> states,
-            @RequestParam(required = false) List<Long> categories,
+            @RequestParam(required = false) List<Long> categoryIds,
             @RequestParam(required = false) String rangeStart,
             @RequestParam(required = false) String rangeEnd,
             @RequestParam(required = false, defaultValue = "0") Integer from,
             @RequestParam(required = false, defaultValue = "10") Integer size
     ) {
         log.info("Request endpoint: 'GET /events' (получение списка всех событий админом)");
-        return eventService.getEvents(users, states, categories, rangeStart, rangeEnd, from, size);
+        return eventService.getEvents(userIds, states, categoryIds, rangeStart, rangeEnd, from, size);
     }
 
     @PatchMapping("/{eventId}")

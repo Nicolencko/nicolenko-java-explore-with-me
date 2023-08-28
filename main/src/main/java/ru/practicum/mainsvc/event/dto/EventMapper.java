@@ -2,11 +2,11 @@ package ru.practicum.mainsvc.event.dto;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.mainsvc.category.service.CategoryService;
 import ru.practicum.mainsvc.category.model.Category;
+import ru.practicum.mainsvc.category.service.CategoryService;
 import ru.practicum.mainsvc.event.model.Event;
-import ru.practicum.mainsvc.user.service.UserService;
 import ru.practicum.mainsvc.user.model.User;
+import ru.practicum.mainsvc.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,8 +45,8 @@ public class EventMapper {
         return new EventFullDto(
                 event.getAnnotation(),
                 new EventFullDto.CategoryDto(
-                        categoryService.getCategory(event.getCategory()).getId(),
-                        categoryService.getCategory(event.getCategory()).getName()),
+                        categoryService.getCategory(event.getCategoryId()).getId(),
+                        categoryService.getCategory(event.getCategoryId()).getName()),
                 event.getConfirmedRequests(),
                 event.getCreatedOn(),
                 event.getDescription(),
@@ -70,8 +70,8 @@ public class EventMapper {
         return new EventShortDto(
                 event.getAnnotation(),
                 new EventFullDto.CategoryDto(
-                        categoryService.getCategory(event.getCategory()).getId(),
-                        categoryService.getCategory(event.getCategory()).getName()),
+                        categoryService.getCategory(event.getCategoryId()).getId(),
+                        categoryService.getCategory(event.getCategoryId()).getName()),
                 event.getConfirmedRequests(),
                 event.getEventDate().format(outFormatter),
                 event.getId(),

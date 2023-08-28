@@ -1,14 +1,13 @@
 package ru.practicum.mainsvc.event.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "events")
@@ -19,7 +18,7 @@ public class Event {
     @Column(name = "annotation")
     private String annotation;
     @Column(name = "category")
-    private Long category;
+    private Long categoryId;
     @Column(name = "confirmed_requests")
     private Integer confirmedRequests;
     @Column(name = "created_on")

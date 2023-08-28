@@ -8,7 +8,7 @@ import ru.practicum.mainsvc.compilations.model.Compilation;
 
 public interface CompilationRepository extends JpaRepository<Compilation, Long> {
 
-    @Query(nativeQuery = true, value = "SELECT * FROM compilations WHERE pinned = :pinned")
+    @Query(nativeQuery = true, value = "SELECT c FROM Compilation c WHERE (:pinned is null or c.pinned = :pinned)")
     Page<Compilation> getCompilations(Boolean pinned, Pageable pageable);
 
     @Query(nativeQuery = true, value = "SELECT * FROM compilations WHERE title = :title")
