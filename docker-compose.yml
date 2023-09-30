@@ -1,49 +1,58 @@
-version: '2.0'
+version: '3.1'
 services:
   stat-server:
-    build: ./stat/stat-server
-    image: stat-server
+    build: stat/stat-server
+    image: stat
     container_name: stat-server
     ports:
-    - "9090:9090"
+      - "9090:9090"
+#      - "9091:9091"
     depends_on:
-      - stats-db
+      - ewm-stats-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/ewm-stats
-      - SERVER_PORT=9090
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=password
+      - STATS_DB_URL=jdbc:postgresql://ewm-stats-db:5432/stat-server-db
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+#      - TZ=Europe/Moscow
 
-  stats-db:
-    image: postgres:9.5-alpine
+  ewm-stats-db:
+    image: postgres:14-alpine
     container_name: ewm-stats-db
     ports:
       - "6541:5432"
+    volumes:
+      - /var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=ewm-stats
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=stat-server-db
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+#      - TZ=Europe/Moscow
 
-  ewm-service:
-    build: main
+  main:
+    build: main/main-server
     image: main
-    container_name: main
+    container_name: main-server
     ports:
       - "8080:8080"
+#      - "8081:8081"
     depends_on:
       - ewm-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/explore
-      - SERVER_PORT=8080
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=password
+      - STATS_SERVER_URL=http://stat-server:9090
+      - EWM_DB_URL=jdbc:postgresql://ewm-db:5432/ewm-server-db
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+#      - TZ=Europe/Moscow
 
   ewm-db:
-    image: postgres:9.5-alpine
+    image: postgres:14.3-alpine
     container_name: ewm-service-db
     ports:
       - "6542:5432"
+    volumes:
+      - /var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=explore
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=ewm-server-db
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+#      - TZ=Europe/Moscow
