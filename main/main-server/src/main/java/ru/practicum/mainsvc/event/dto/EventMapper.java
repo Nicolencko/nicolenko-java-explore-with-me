@@ -121,10 +121,10 @@ public abstract class EventMapper {
         eventShortDto.title(event.getTitle());
 
         eventShortDto.views(views);
-
-        if (rateRepository.getEventRateView(event.getId()).isPresent()) {
-            eventShortDto.rating(rateRepository.getEventRateView(event.getId()).get().getRating());
-        } else eventShortDto.rating(0L);
+        rateRepository.getEventRateView(event.getId())
+                .ifPresentOrElse(view -> eventShortDto.rating(view.getRating()),
+                        () -> eventShortDto.rating(0L)
+                );
 
         return eventShortDto.build();
     }

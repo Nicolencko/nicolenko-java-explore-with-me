@@ -5,7 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.mainsvc.event.dto.*;
+import ru.practicum.mainsvc.event.dto.EventFullDto;
+import ru.practicum.mainsvc.event.dto.EventShortDto;
+import ru.practicum.mainsvc.event.dto.NewEventDto;
+import ru.practicum.mainsvc.event.dto.UpdateEventUserRequest;
+import ru.practicum.mainsvc.event.model.EventRatingView;
 import ru.practicum.mainsvc.event.service.EventService;
 
 import javax.validation.Valid;
@@ -58,9 +62,9 @@ public class EventPrivateController {
 
     @PostMapping("/{eventId}/rate")
     @ResponseStatus(HttpStatus.CREATED)
-    public EventRatingDto addLike(@PathVariable Long userId,
-                                  @PathVariable Long eventId,
-                                  @RequestParam(required = true) Boolean isLike) {
+    public EventRatingView addLike(@PathVariable Long userId,
+                                   @PathVariable Long eventId,
+                                   @RequestParam(required = true) Boolean isLike) {
         log.info("Add like or dislike to event={}, by user={}", eventId, userId);
         return eventService.addLike(userId, eventId, isLike);
     }

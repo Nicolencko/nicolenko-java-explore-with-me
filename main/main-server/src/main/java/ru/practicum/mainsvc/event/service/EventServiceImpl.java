@@ -37,7 +37,6 @@ public class EventServiceImpl implements EventService {
     private final StatClient statClient;
     private final UserService userService;
     private final EventRepository eventRepository;
-    private final EventRatingMapper eventRatingMapper;
     private final EventMapper eventMapper;
     private final LocationRepository locationRepository;
     private final LocationMapper locationMapper;
@@ -197,7 +196,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public EventRatingDto addLike(Long userId, Long eventId, Boolean isLike) {
+    public EventRatingView addLike(Long userId, Long eventId, Boolean isLike) {
         User user = userService.getUser(userId);
         Event event = getOrThrow(eventId);
         long rating;
@@ -211,7 +210,13 @@ public class EventServiceImpl implements EventService {
                 .user(user)
                 .rating(rating)
                 .build();
-        return eventRatingMapper.eventRateToDto(rateRepository.save(eventUserRating));
+        rateRepository.save(eventUserRating);
+        Optional<EventRatingView> eventRatingView = rateRepository.getEventRateView(eventId);
+        if (eventRatingView.isPresent()) {
+            return eventRatingView.get();
+        } else {
+            throw new NotFoundException("Событие не найдено");
+        }
     }
 
     @Override

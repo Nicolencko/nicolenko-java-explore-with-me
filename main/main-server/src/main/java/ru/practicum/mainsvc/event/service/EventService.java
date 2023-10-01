@@ -1,6 +1,9 @@
 package ru.practicum.mainsvc.event.service;
 
-import ru.practicum.mainsvc.event.dto.*;
+import ru.practicum.mainsvc.event.dto.EventFullDto;
+import ru.practicum.mainsvc.event.dto.EventShortDto;
+import ru.practicum.mainsvc.event.dto.NewEventDto;
+import ru.practicum.mainsvc.event.dto.UpdateEventUserRequest;
 import ru.practicum.mainsvc.event.model.Event;
 import ru.practicum.mainsvc.event.model.EventRatingView;
 import ru.practicum.mainsvc.event.model.State;
@@ -57,7 +60,7 @@ public interface EventService {
 
     EventFullDto updateEvent(Long eventId, UpdateEventUserRequest updateEventUserRequest);
 
-    EventRatingDto addLike(Long userId, Long eventId, Boolean isLike);
+    EventRatingView addLike(Long userId, Long eventId, Boolean isLike);
 
     void deleteLike(Long userId, Long eventId);
 
