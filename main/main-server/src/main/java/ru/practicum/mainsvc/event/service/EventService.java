@@ -5,6 +5,7 @@ import ru.practicum.mainsvc.event.dto.EventShortDto;
 import ru.practicum.mainsvc.event.dto.NewEventDto;
 import ru.practicum.mainsvc.event.dto.UpdateEventUserRequest;
 import ru.practicum.mainsvc.event.model.Event;
+import ru.practicum.mainsvc.event.model.EventRatingView;
 import ru.practicum.mainsvc.event.model.State;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,4 +59,10 @@ public interface EventService {
                                  Integer size);
 
     EventFullDto updateEvent(Long eventId, UpdateEventUserRequest updateEventUserRequest);
+
+    EventRatingView addLike(Long userId, Long eventId, Boolean isLike);
+
+    void deleteLike(Long userId, Long eventId);
+
+    List<EventRatingView> getEventsRatings(Integer from, Integer size);
 }

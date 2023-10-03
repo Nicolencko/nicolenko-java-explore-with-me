@@ -1,4 +1,4 @@
-package ru.practicum.mainsvc.event.mapper;
+package ru.practicum.mainsvc.event.dto;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -7,11 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ru.practicum.mainsvc.category.dto.CategoryDto;
 import ru.practicum.mainsvc.category.model.Category;
 import ru.practicum.mainsvc.category.service.CategoryService;
-import ru.practicum.mainsvc.event.dto.EventFullDto;
-import ru.practicum.mainsvc.event.dto.EventShortDto;
-import ru.practicum.mainsvc.event.dto.NewEventDto;
-import ru.practicum.mainsvc.event.dto.UpdateEventUserRequest;
 import ru.practicum.mainsvc.event.model.Event;
+import ru.practicum.mainsvc.event.repository.RateRepository;
 import ru.practicum.mainsvc.location.dto.LocationDto;
 import ru.practicum.mainsvc.location.model.Location;
 import ru.practicum.mainsvc.location.repository.LocationRepository;
@@ -24,6 +21,8 @@ public abstract class EventMapper {
     protected CategoryService categoryService;
     @Autowired
     protected LocationRepository locationRepository;
+    @Autowired
+    protected RateRepository rateRepository;
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "category", source = "newEventDto", qualifiedByName = "categoryFromNewEventDto")
@@ -122,6 +121,10 @@ public abstract class EventMapper {
         eventShortDto.title(event.getTitle());
 
         eventShortDto.views(views);
+        rateRepository.getEventRateView(event.getId())
+                .ifPresentOrElse(view -> eventShortDto.rating(view.getRating()),
+                        () -> eventShortDto.rating(0L)
+                );
 
         return eventShortDto.build();
     }

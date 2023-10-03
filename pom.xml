@@ -9,6 +9,7 @@
 		<version>2.7.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+	
 	<groupId>ru.practicum</groupId>
 	<artifactId>explore-with-me</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -20,7 +21,7 @@
 		<module>stat</module>
 		<module>main</module>
 	</modules>
-
+	
 	<properties>
 		<java.version>11</java.version>
 		<maven.compiler.source>11</maven.compiler.source>
@@ -35,6 +36,7 @@
 		<annotations.version>20.1.0</annotations.version>
 	</properties>
 
+	
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -246,5 +248,6 @@
 			</build>
 		</profile>
 	</profiles>
+	
 
 </project>

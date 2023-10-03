@@ -1,4 +1,4 @@
-package ru.practicum.mainsvc.event;
+package ru.practicum.mainsvc.event.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.mainsvc.event.dto.EventFullDto;
 import ru.practicum.mainsvc.event.dto.EventShortDto;
+import ru.practicum.mainsvc.event.model.EventRatingView;
 import ru.practicum.mainsvc.event.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -49,4 +50,14 @@ public class EventController {
         log.info("Request endpoint: 'GET /events/{} (Получение события по eventId)", eventId);
         return eventService.getEvent(eventId, request);
     }
+
+    @GetMapping("/ratings")
+    @ResponseStatus(HttpStatus.OK)
+    public List<EventRatingView> getEventsRatings(@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                  @Positive @RequestParam(defaultValue = "10") Integer size) {
+        log.info("Request endpoint: 'GET /events/ratings (Получение событий с рейтингом)");
+        return eventService.getEventsRatings(from, size);
+    }
+
+
 }

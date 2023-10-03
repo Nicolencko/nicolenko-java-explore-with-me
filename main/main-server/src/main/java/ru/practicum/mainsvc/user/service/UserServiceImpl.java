@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.mainsvc.user.model.InitiatorRateView;
+import ru.practicum.mainsvc.event.repository.RateRepository;
 import ru.practicum.mainsvc.exception.ConflictException;
 import ru.practicum.mainsvc.exception.NotFoundException;
 import ru.practicum.mainsvc.user.dto.UserDto;
@@ -21,6 +23,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final RateRepository rateRepository;
 
     @Override
     @Transactional
@@ -56,6 +59,12 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long userId) {
         getUser(userId);
         userRepository.deleteById(userId);
+    }
+
+    @Override
+    public List<InitiatorRateView> getUsersRatings(Integer from, Integer size) {
+        Pagination page = new Pagination(from, size);
+        return rateRepository.getAllUsersRateViews(page);
     }
 
     public User getUser(Long userId) {

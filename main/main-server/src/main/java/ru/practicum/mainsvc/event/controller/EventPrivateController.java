@@ -1,4 +1,4 @@
-package ru.practicum.mainsvc.event;
+package ru.practicum.mainsvc.event.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +9,7 @@ import ru.practicum.mainsvc.event.dto.EventFullDto;
 import ru.practicum.mainsvc.event.dto.EventShortDto;
 import ru.practicum.mainsvc.event.dto.NewEventDto;
 import ru.practicum.mainsvc.event.dto.UpdateEventUserRequest;
+import ru.practicum.mainsvc.event.model.EventRatingView;
 import ru.practicum.mainsvc.event.service.EventService;
 
 import javax.validation.Valid;
@@ -57,6 +58,23 @@ public class EventPrivateController {
                                     @RequestBody @Valid UpdateEventUserRequest updateEventUserRequest) {
         log.info("Request endpoint: 'PATCH /users/{}/events/{}' (Изменение события)", userId, eventId);
         return eventService.updateEventByUser(userId, eventId, updateEventUserRequest);
+    }
+
+    @PostMapping("/{eventId}/rate")
+    @ResponseStatus(HttpStatus.CREATED)
+    public EventRatingView addLike(@PathVariable Long userId,
+                                   @PathVariable Long eventId,
+                                   @RequestParam(required = true) Boolean isLike) {
+        log.info("Add like or dislike to event={}, by user={}", eventId, userId);
+        return eventService.addLike(userId, eventId, isLike);
+    }
+
+    @DeleteMapping("/{eventId}/rate")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteLike(@PathVariable Long userId,
+                           @PathVariable Long eventId) {
+        log.info("Delete like or dislike from event={}, by user={}", eventId, userId);
+        eventService.deleteLike(userId, eventId);
     }
 
 }

@@ -1,5 +1,6 @@
 package ru.practicum.mainsvc.user.service;
 
+import ru.practicum.mainsvc.user.model.InitiatorRateView;
 import ru.practicum.mainsvc.user.dto.UserDto;
 import ru.practicum.mainsvc.user.model.User;
 
@@ -13,4 +14,6 @@ public interface UserService {
     void deleteUser(Long userId);
 
     User getUser(Long userId);
+
+    List<InitiatorRateView> getUsersRatings(Integer from, Integer size);
 }

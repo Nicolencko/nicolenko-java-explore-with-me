@@ -5,15 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.mainsvc.event.dto.EventFullDto;
-import ru.practicum.mainsvc.event.dto.EventShortDto;
-import ru.practicum.mainsvc.event.dto.NewEventDto;
-import ru.practicum.mainsvc.event.dto.UpdateEventUserRequest;
-import ru.practicum.mainsvc.event.mapper.EventMapper;
-import ru.practicum.mainsvc.event.model.Event;
-import ru.practicum.mainsvc.event.model.SortValues;
-import ru.practicum.mainsvc.event.model.State;
+import ru.practicum.ewm.stats.client.StatClient;
+import ru.practicum.ewm.stats.dto.HitRequestDto;
+import ru.practicum.ewm.stats.dto.ViewStatsResponseDto;
+import ru.practicum.mainsvc.event.dto.*;
+import ru.practicum.mainsvc.event.model.*;
 import ru.practicum.mainsvc.event.repository.EventRepository;
+import ru.practicum.mainsvc.event.repository.RateRepository;
 import ru.practicum.mainsvc.exception.ConflictException;
 import ru.practicum.mainsvc.exception.CustomValidationException;
 import ru.practicum.mainsvc.exception.NotFoundException;
@@ -23,9 +21,6 @@ import ru.practicum.mainsvc.location.repository.LocationRepository;
 import ru.practicum.mainsvc.user.model.User;
 import ru.practicum.mainsvc.user.service.UserService;
 import ru.practicum.mainsvc.util.Pagination;
-import ru.practicum.ewm.stats.client.StatClient;
-import ru.practicum.ewm.stats.dto.HitRequestDto;
-import ru.practicum.ewm.stats.dto.ViewStatsResponseDto;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -45,6 +40,7 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
     private final LocationRepository locationRepository;
     private final LocationMapper locationMapper;
+    private final RateRepository rateRepository;
 
     @Override
     @Transactional
@@ -158,7 +154,6 @@ public class EventServiceImpl implements EventService {
         Long views = result.get(uri);
 
         return eventMapper.eventFullDtoFromEvent(eventRepository.save(event), views);
-
     }
 
     @Override
@@ -200,6 +195,53 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
+    public EventRatingView addLike(Long userId, Long eventId, Boolean isLike) {
+        User user = userService.getUser(userId);
+        Event event = getOrThrow(eventId);
+        long rating;
+        if (isLike) {
+            rating = 1L;
+        } else {
+            rating = -1L;
+        }
+        EventUserRating eventUserRating = EventUserRating.builder()
+                .event(event)
+                .user(user)
+                .rating(rating)
+                .build();
+        rateRepository.save(eventUserRating);
+        Optional<EventRatingView> eventRatingView = rateRepository.getEventRateView(eventId);
+        if (eventRatingView.isPresent()) {
+            return eventRatingView.get();
+        } else {
+            throw new NotFoundException("Событие не найдено");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteLike(Long userId, Long eventId) {
+        User user = userService.getUser(userId);
+        Event event = getOrThrow(eventId);
+        if (!rateRepository.existsByUserIdAndEventId(userId, eventId)) {
+            throw new NotFoundException("Событие ещё не было оценено");
+        }
+        EventUserRating eventUserRating = EventUserRating.builder()
+                .event(event)
+                .user(user)
+                .build();
+        rateRepository.delete(eventUserRating);
+    }
+
+    @Override
+    public List<EventRatingView> getEventsRatings(Integer from, Integer size) {
+        Pagination page = new Pagination(from, size);
+        return rateRepository.getAllEventsRateViews(page);
+    }
+
+
+    @Override
     public void decreaseConfirmedRequests(Event event) {
         Long confirmedRequestsNew = event.getConfirmedRequests() - 1L;
         event.setConfirmedRequests(confirmedRequestsNew);
@@ -232,7 +274,7 @@ public class EventServiceImpl implements EventService {
                                          Integer size,
                                          HttpServletRequest request) {
         if (rangeStart != null && rangeEnd != null && rangeStart.isAfter(rangeEnd)) {
-            throw new CustomValidationException("Начало должно быть после окончания");
+            throw new CustomValidationException("Дата начала должна быть после даты окончания");
         }
         Pagination page = new Pagination(from, size);
         List<Event> events = eventRepository
@@ -246,13 +288,16 @@ public class EventServiceImpl implements EventService {
 
         if (sort != null) {
             SortValues sortValue = SortValues.from(sort).orElseThrow(() ->
-                    new CustomValidationException(String.format("Unsupported status = %s", sort)));
+                    new CustomValidationException("Неподдерживаемый статус"));
             switch (sortValue) {
                 case VIEWS:
                     result.sort((o1, o2) -> (int) (o1.getViews() - o2.getViews()));
                     break;
                 case EVENT_DATE:
                     result.sort(Comparator.comparing(EventShortDto::getEventDate));
+                    break;
+                case RATES:
+                    result.sort((o1, o2) -> (int) (o2.getRating() - o1.getRating()));
             }
         }
         addHit(request);
@@ -296,10 +341,9 @@ public class EventServiceImpl implements EventService {
         if (statistics.isEmpty()) {
             return Collections.emptyMap();
         }
-        Map<String, Long> resultMap = statistics.stream()
-                .collect(Collectors.toMap(ViewStatsResponseDto::getUri, ViewStatsResponseDto::getHits, (a, b) -> b));
 
-        return resultMap;
+        return statistics.stream()
+                .collect(Collectors.toMap(ViewStatsResponseDto::getUri, ViewStatsResponseDto::getHits, (a, b) -> b));
     }
 
     private void addHit(HttpServletRequest request) {
@@ -324,6 +368,7 @@ public class EventServiceImpl implements EventService {
         }
     }
 
+    @Override
     public void increaseConfirmedRequests(Event event) {
         Long confirmedRequestsNew = event.getConfirmedRequests() + 1L;
         event.setConfirmedRequests(confirmedRequestsNew);
