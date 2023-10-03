@@ -31,7 +31,6 @@
 						</systemPropertyVariables>
 					</configuration>
 				</plugin>
-				<!-- Плагин для корректной работы MapStruct и Lombok -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
@@ -44,13 +43,11 @@
 								<artifactId>lombok</artifactId>
 								<version>${org.projectlombok.version}</version>
 							</path>
-							<!-- This is needed when using Lombok 1.18.16 and above -->
 							<path>
 								<groupId>org.projectlombok</groupId>
 								<artifactId>lombok-mapstruct-binding</artifactId>
 								<version>0.2.0</version>
 							</path>
-							<!-- Mapstruct should follow the lombok path(s) -->
 							<path>
 								<groupId>org.mapstruct</groupId>
 								<artifactId>mapstruct-processor</artifactId>

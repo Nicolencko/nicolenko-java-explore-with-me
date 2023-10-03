@@ -6,7 +6,6 @@ import ru.practicum.mainsvc.location.model.Location;
 import ru.practicum.mainsvc.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 import static ru.practicum.mainsvc.event.model.State.PENDING;
@@ -25,7 +24,6 @@ public class Event {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @NotBlank
     @Column(length = 2000)
     private String annotation;
 
@@ -41,7 +39,6 @@ public class Event {
     @Column(name = "created_on")
     private LocalDateTime createdOn;
 
-    @NotBlank
     @Column(length = 7000)
     private String description;
 
@@ -73,7 +70,6 @@ public class Event {
     @Builder.Default
     private State state = PENDING;
 
-    @NotBlank
     @Column(length = 120)
     private String title;
 }
