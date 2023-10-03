@@ -3,7 +3,6 @@ package ru.practicum.mainsvc.user.model;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
@@ -17,11 +16,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
     @Column
     private String name;
 
-    @NotBlank
     @Column(length = 512, unique = true)
     private String email;
 

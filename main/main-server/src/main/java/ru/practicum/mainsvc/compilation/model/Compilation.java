@@ -4,7 +4,6 @@ import lombok.*;
 import ru.practicum.mainsvc.event.model.Event;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
 @Getter
@@ -30,7 +29,6 @@ public class Compilation {
     @Builder.Default
     private Boolean pinned = false;
 
-    @NotBlank
     @Column(length = 50)
     private String title;
 }
